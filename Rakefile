@@ -11,4 +11,4 @@ task :publish_gem do |task|
   puts "Published #{gem}" if gem
 end
 
-task :default => :test
+task :default => :spec
