@@ -6,7 +6,7 @@ module DataInsight
       def self.included(model)
         model.property :id, DataMapper::Property::Serial
         model.property :collected_at, DateTime, required: true
-        model.property :collector, String, required: true
+        model.property :source, String, required: true
       end
     end
   end
