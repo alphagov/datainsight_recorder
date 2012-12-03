@@ -45,7 +45,7 @@ module DataInsight
       def configure_test
         DataMapper.setup(:default, test_uri)
         DataMapper.finalize
-        DataMapper.auto_upgrade!
+        DataMapper.auto_migrate!
       end
     end
   end

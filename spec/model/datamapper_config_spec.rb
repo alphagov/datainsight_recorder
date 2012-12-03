@@ -75,7 +75,7 @@ describe "DataMapperConfig" do
       before(:each) do
         DataMapper.should_receive(:setup).with(:default, "test uri")
         DataMapper.should_receive(:finalize)
-        DataMapper.should_receive(:"auto_upgrade!")
+        DataMapper.should_receive(:"auto_migrate!") # During tests we want to completely destroy the database
       end
 
       it "should configure datamapper" do

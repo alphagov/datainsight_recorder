@@ -8,7 +8,7 @@ module DataInsight
 
       def validate_time_series_week
         unless end_at.nil? || start_at.nil?
-          if (end_at - start_at) == 6
+          if (end_at - start_at) == 7
             true
           else
             [false, "The time between start and end should be a week."]

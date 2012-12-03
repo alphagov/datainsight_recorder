@@ -25,5 +25,6 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency("simplecov")
   gem.add_development_dependency("gemfury")
   gem.add_development_dependency("gem_publisher", "~> 1.1.1")
+  gem.add_development_dependency("dm-sqlite-adapter")
 
 end
