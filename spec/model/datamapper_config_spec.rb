@@ -22,6 +22,47 @@ module BadDataMapperConfig
 end
 
 describe "DataMapperConfig" do
+  describe "automatic" do
+    describe "configure" do
+      before(:each) do
+        @temp_rack_env = ENV["RACK_ENV"]
+        @temp_rails_env = ENV["RAILS_ENV"]
+
+        ENV.delete("RACK_ENV")
+        ENV.delete("RAILS_ENV")
+
+        DataMapper.should_receive(:finalize)
+        DataMapper.should_receive(:"auto_upgrade!")
+      end
+
+      after(:each) do
+        ENV["RACK_ENV"] = @temp_rack_env
+        ENV["RAILS_ENV"] = @temp_rails_env
+      end
+
+      it "should default to development" do
+        DataMapper.should_receive(:setup).with(:default, "development uri")
+        GoodDataMapperConfig.configure
+      end
+
+      it "should select the production environment if RACK_ENV is set to development" do
+        ENV["RACK_ENV"] = "production"
+
+        DataMapper.should_receive(:setup).with(:default, "production uri")
+
+        GoodDataMapperConfig.configure
+      end
+
+      it "should select the production environment if RAILS_ENV is set to development" do
+        ENV["RAILS_ENV"] = "production"
+
+        DataMapper.should_receive(:setup).with(:default, "production uri")
+
+        GoodDataMapperConfig.configure
+      end
+    end
+  end
+
   describe "development" do
     describe "configure" do
       before(:each) do

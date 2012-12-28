@@ -5,7 +5,7 @@ require 'dm-migrations'
 module DataInsight
   module Recorder
     module DataMapperConfig
-      def configure(env=ENV["RACK_ENV"])
+      def configure(env=ENV["RACK_ENV"] || ENV["RAILS_ENV"])
         DataMapper.logger = Logging.logger[DataMapper]
         case (env or "default").to_sym
           when :test
