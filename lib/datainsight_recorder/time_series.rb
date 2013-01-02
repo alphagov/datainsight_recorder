@@ -15,6 +15,19 @@ module DataInsight
           end
         end
       end
+
+      def validate_time_series_day
+
+        unless start_at.nil? || end_at.nil?
+          if (end_at - start_at) != 1
+            return [false, "The time period must be a day."]
+          end
+          if start_at.hour != 0 || start_at.minute != 0 || start_at.second != 0 || start_at.second_fraction != 0
+            return [false, "The time period must start at midnight."]
+          end
+          true
+        end
+      end
     end
   end
 end
