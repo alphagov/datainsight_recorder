@@ -19,6 +19,14 @@ class TestDaySeries
   validates_with_method :validate_time_series_day
 end
 
+class TestHourSeries
+  include DataMapper::Resource
+  include DataInsight::Recorder::BaseFields
+  include DataInsight::Recorder::TimeSeries
+
+  validates_with_method :validate_time_series_hour
+end
+
 describe "TimeSeries" do
   before(:all) do
     TestDataMapperConfig.configure(:test)
@@ -127,6 +135,52 @@ describe "TimeSeries" do
         :collected_at => DateTime.now,
         :start_at => DateTime.new(2012, 1, 1),
         :end_at => DateTime.new(2012, 1, 2)
+      )
+
+      record.valid?.should be_true
+    end
+  end
+
+  describe "validate_time_series_hour" do
+    it "should not allow a time period of more than an hour" do
+      record = TestHourSeries.new(
+        :source => "My source",
+        :collected_at => DateTime.now,
+        :start_at => DateTime.new(2012, 1, 1, 0),
+        :end_at => DateTime.new(2012, 1, 1, 2)
+      )
+
+      should_be_invalid(record, :validate_time_series_hour, "The time period must be an hour.")
+    end
+
+    it "should not allow a time period of less than an hour" do
+      record = TestHourSeries.new(
+        :source => "My source",
+        :collected_at => DateTime.now,
+        :start_at => DateTime.new(2012, 1, 1, 0),
+        :end_at => DateTime.new(2012, 1, 1, 1, 30)
+      )
+
+      should_be_invalid(record, :validate_time_series_hour, "The time period must be an hour.")
+    end
+
+    it "should not allow a time period that does not start on the hour" do
+      record = TestHourSeries.new(
+        :source => "My source",
+        :collected_at => DateTime.now,
+        :start_at => DateTime.new(2012, 1, 1, 0, 30),
+        :end_at => DateTime.new(2012, 1, 1, 1, 30)
+      )
+
+      should_be_invalid(record, :validate_time_series_hour, "The time period must start on the hour.")
+    end
+
+    it "should allow a valid time period" do
+      record = TestHourSeries.new(
+        :source => "My source",
+        :collected_at => DateTime.now,
+        :start_at => DateTime.new(2012, 1, 1, 0),
+        :end_at => DateTime.new(2012, 1, 1, 1)
       )
 
       record.valid?.should be_true

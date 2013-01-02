@@ -28,6 +28,18 @@ module DataInsight
           true
         end
       end
+
+      def validate_time_series_hour
+        unless start_at.nil? || end_at.nil?
+          if (end_at - start_at) != Rational(1, 24)
+            return [false, "The time period must be an hour."]
+          end
+          if start_at.minute != 0 || start_at.second != 0 || start_at.second_fraction != 0
+            return [false, "The time period must start on the hour."]
+          end
+        end
+        return true
+      end
     end
   end
 end
