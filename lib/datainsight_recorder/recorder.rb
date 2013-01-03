@@ -15,6 +15,11 @@ module DataInsight
         end
       end
 
+      # This must be unique across recorders.
+      def queue_name
+        raise NotImplementedError
+      end
+
       def routing_keys
         raise NotImplementedError
       end
@@ -30,7 +35,7 @@ module DataInsight
       def create_queue
         client = Bunny.new ENV["AMQP"]
         client.start
-        queue = client.queue(ENV["QUEUE"] || "insidegov")
+        queue = client.queue(queue_name)
         exchange = client.exchange("datainsight", :type => :topic)
 
         routing_keys.each do |key|
