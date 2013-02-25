@@ -7,7 +7,7 @@ end
 
 require "gem_publisher"
 task :publish_gem do |task|
-  gem = GemPublisher.publish_if_updated("datainsight_recorder.gemspec", :gemfury)
+  gem = GemPublisher.publish_if_updated("datainsight_recorder.gemspec", :gemfury, :as => 'govuk')
   puts "Published #{gem}" if gem
 end
 
