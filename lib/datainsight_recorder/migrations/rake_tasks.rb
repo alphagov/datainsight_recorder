@@ -35,4 +35,6 @@ namespace :db do
       end
     end
   end
+
+  task :migrate => "migrate:up"
 end
