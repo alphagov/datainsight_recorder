@@ -32,7 +32,6 @@ describe "DataMapperConfig" do
         ENV.delete("RAILS_ENV")
 
         DataMapper.should_receive(:finalize)
-        DataMapper.should_receive(:"auto_upgrade!")
       end
 
       after(:each) do
@@ -68,7 +67,6 @@ describe "DataMapperConfig" do
       before(:each) do
         DataMapper.should_receive(:setup).with(:default, "development uri")
         DataMapper.should_receive(:finalize)
-        DataMapper.should_receive(:"auto_upgrade!")
       end
 
       it "should configure datamapper" do
@@ -92,7 +90,6 @@ describe "DataMapperConfig" do
       before(:each) do
         DataMapper.should_receive(:setup).with(:default, "production uri")
         DataMapper.should_receive(:finalize)
-        DataMapper.should_receive(:"auto_upgrade!")
       end
 
       it "should configure datamapper" do
@@ -116,7 +113,6 @@ describe "DataMapperConfig" do
       before(:each) do
         DataMapper.should_receive(:setup).with(:default, "test uri")
         DataMapper.should_receive(:finalize)
-        DataMapper.should_receive(:"auto_migrate!") # During tests we want to completely destroy the database
       end
 
       it "should configure datamapper" do
