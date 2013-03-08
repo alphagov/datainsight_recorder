@@ -25,7 +25,6 @@ module DataInsight
       def configure_development
         DataMapper.setup(:default, development_uri)
         DataMapper.finalize
-        DataMapper.auto_upgrade!
       end
 
       def production_uri
@@ -35,7 +34,6 @@ module DataInsight
       def configure_production
         DataMapper.setup(:default, production_uri)
         DataMapper.finalize
-        DataMapper.auto_upgrade!
       end
 
       def test_uri
@@ -45,7 +43,6 @@ module DataInsight
       def configure_test
         DataMapper.setup(:default, test_uri)
         DataMapper.finalize
-        DataMapper.auto_migrate!
       end
     end
   end
