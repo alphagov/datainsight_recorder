@@ -4,7 +4,7 @@ require_relative "../datamapper_config"
 
 namespace :db do
   task :configure do
-    DataMapperConfig.configure
+    DataInsight::Recorder::DataMapperConfig.configure
   end
 
   namespace :migrate do
