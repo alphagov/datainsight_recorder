@@ -29,12 +29,14 @@ end
 
 describe "TimeSeries" do
   before(:all) do
-    TestDataMapperConfig.configure(:test)
+    DataInsight::Recorder::DataMapperConfig.configure(:test)
+    DataMapper.auto_migrate!
   end
 
   after(:each) do
     TestWeekSeries.destroy!
     TestDaySeries.destroy!
+    TestHourSeries.destroy!
   end
   it "should add time series fields" do
     model = mock()

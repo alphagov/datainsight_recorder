@@ -8,11 +8,12 @@ end
 
 describe "BaseFields" do
   before(:all) do
-    TestDataMapperConfig.configure(:test)
+    DataInsight::Recorder::DataMapperConfig.configure(:test)
+    DataMapper.auto_migrate!
   end
 
   after(:each) do
-    TestWeekSeries.destroy!
+    TestBaseFields.destroy!
   end
 
   it "should add base fields" do

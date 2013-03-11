@@ -1,48 +1,30 @@
 require "datainsight_logging"
+require "yaml"
 require 'dm-constraints'
 require 'dm-migrations'
 
 module DataInsight
   module Recorder
-    module DataMapperConfig
-      def configure(env=ENV["RACK_ENV"] || ENV["RAILS_ENV"])
+    class DataMapperConfig
+      def self.configure(env=nil)
+        config_path = File.join(Dir.pwd, 'config', 'databases.yml')
+
+        config_new = DataMapperConfig.new(File.read(config_path))
+        config_new.configure(env)
+      end
+
+      def initialize(config_data)
+        @config = YAML.load(config_data)
+      end
+
+      def configure(env = nil)
+        env = env || ENV["RACK_ENV"] || ENV["RAILS_ENV"] || "development"
+        raise ArgumentError.new("No database configuration for environment: #{env}") unless @config.has_key? env.to_s
+
         DataMapper.logger = Logging.logger[DataMapper]
-        case (env or "default").to_sym
-          when :test
-            self.configure_test
-          when :production
-            self.configure_production
-          else
-            self.configure_development
-        end
+        DataMapper.setup(:default, @config[env.to_s]["uri"])
+        DataMapper.finalize
         DataMapper::Model.raise_on_save_failure = true
-      end
-
-      def development_uri
-        raise NotImplementedError
-      end
-
-      def configure_development
-        DataMapper.setup(:default, development_uri)
-        DataMapper.finalize
-      end
-
-      def production_uri
-        raise NotImplementedError
-      end
-
-      def configure_production
-        DataMapper.setup(:default, production_uri)
-        DataMapper.finalize
-      end
-
-      def test_uri
-        raise NotImplementedError
-      end
-
-      def configure_test
-        DataMapper.setup(:default, test_uri)
-        DataMapper.finalize
       end
     end
   end

@@ -1,133 +1,67 @@
 require_relative "../spec_helper"
 require_relative "../../lib/datainsight_recorder/datamapper_config"
 
-module GoodDataMapperConfig
-  extend DataInsight::Recorder::DataMapperConfig
+TEST_CONFIG = <<-HERE
+development:
+  uri: dev-uri
 
-  def self.development_uri
-    "development uri"
-  end
-
-  def self.production_uri
-    "production uri"
-  end
-
-  def self.test_uri
-    "test uri"
-  end
-end
-
-module BadDataMapperConfig
-  extend DataInsight::Recorder::DataMapperConfig
-end
+test:
+  uri: test-uri
+HERE
 
 describe "DataMapperConfig" do
-  describe "automatic" do
-    describe "configure" do
-      before(:each) do
-        @temp_rack_env = ENV["RACK_ENV"]
-        @temp_rails_env = ENV["RAILS_ENV"]
+  it "should initialize datamapper with development uri" do
+    DataMapper.should_receive(:setup).with(:default, "dev-uri")
 
-        ENV.delete("RACK_ENV")
-        ENV.delete("RAILS_ENV")
-
-        DataMapper.should_receive(:finalize)
-      end
-
-      after(:each) do
-        ENV["RACK_ENV"] = @temp_rack_env
-        ENV["RAILS_ENV"] = @temp_rails_env
-      end
-
-      it "should default to development" do
-        DataMapper.should_receive(:setup).with(:default, "development uri")
-        GoodDataMapperConfig.configure
-      end
-
-      it "should select the production environment if RACK_ENV is set to development" do
-        ENV["RACK_ENV"] = "production"
-
-        DataMapper.should_receive(:setup).with(:default, "production uri")
-
-        GoodDataMapperConfig.configure
-      end
-
-      it "should select the production environment if RAILS_ENV is set to development" do
-        ENV["RAILS_ENV"] = "production"
-
-        DataMapper.should_receive(:setup).with(:default, "production uri")
-
-        GoodDataMapperConfig.configure
-      end
-    end
+    config_new = DataInsight::Recorder::DataMapperConfig.new(TEST_CONFIG)
+    config_new.configure(:development)
   end
 
-  describe "development" do
-    describe "configure" do
-      before(:each) do
-        DataMapper.should_receive(:setup).with(:default, "development uri")
-        DataMapper.should_receive(:finalize)
-      end
-
-      it "should configure datamapper" do
-        GoodDataMapperConfig.configure_development
-      end
-
-      it "should select the right configuration" do
-        DataMapper::Model.should_receive(:"raise_on_save_failure=").with(true)
-
-        GoodDataMapperConfig.configure(:development)
-      end
-    end
-
-    it "should fail to configure" do
-      lambda{ BadDataMapperConfig.configure_development }.should raise_error(NotImplementedError)
-    end
+  it "should raise an error if the selected environment is not present in the configuration" do
+    lambda {
+      config_new = DataInsight::Recorder::DataMapperConfig.new(TEST_CONFIG)
+      config_new.configure(:invalid_config)
+    }.should raise_error(ArgumentError)
   end
 
-  describe "production" do
-    describe "configure" do
-      before(:each) do
-        DataMapper.should_receive(:setup).with(:default, "production uri")
-        DataMapper.should_receive(:finalize)
-      end
+  before(:each) do
+    @original_rack_env = ENV["RACK_ENV"]
+    @original_rails_env = ENV["RAILS_ENV"]
 
-      it "should configure datamapper" do
-        GoodDataMapperConfig.configure_production
-      end
-
-      it "should select the right configuration" do
-        DataMapper::Model.should_receive(:"raise_on_save_failure=").with(true)
-
-        GoodDataMapperConfig.configure(:production)
-      end
-    end
-
-    it "should fail to configure" do
-      lambda{ BadDataMapperConfig.configure_production }.should raise_error(NotImplementedError)
-    end
+    ENV.delete("RACK_ENV")
+    ENV.delete("RAILS_ENV")
   end
 
-  describe "test" do
-    describe "configure" do
-      before(:each) do
-        DataMapper.should_receive(:setup).with(:default, "test uri")
-        DataMapper.should_receive(:finalize)
-      end
-
-      it "should configure datamapper" do
-        GoodDataMapperConfig.configure_test
-      end
-
-      it "should select the right configuration" do
-        DataMapper::Model.should_receive(:"raise_on_save_failure=").with(true)
-
-        GoodDataMapperConfig.configure(:test)
-      end
-    end
-
-    it "should fail to configure" do
-      lambda{ BadDataMapperConfig.configure_test }.should raise_error(NotImplementedError)
-    end
+  after(:each) do
+    ENV["RACK_ENV"] = @original_rack_env
+    ENV["RAILS_ENV"] = @original_rails_env
   end
+
+  it "should select the environment defined by RACK_ENV variable" do
+    ENV["RACK_ENV"] = "development"
+
+    DataMapper.should_receive(:setup).with(:default, "dev-uri")
+
+    config_new = DataInsight::Recorder::DataMapperConfig.new(TEST_CONFIG)
+    config_new.configure
+  end
+
+  it "should select the environment defined by RAILS_ENV variable if RACK_ENV is missing" do
+    ENV["RAILS_ENV"] = "test"
+
+    DataMapper.should_receive(:setup).with(:default, "test-uri")
+
+    config_new = DataInsight::Recorder::DataMapperConfig.new(TEST_CONFIG)
+    config_new.configure
+
+  end
+
+  it "should select development if RAILS_ENV and RACK_ENV is missing" do
+    DataMapper.should_receive(:setup).with(:default, "dev-uri")
+
+    config_new = DataInsight::Recorder::DataMapperConfig.new(TEST_CONFIG)
+    config_new.configure
+
+  end
+
 end

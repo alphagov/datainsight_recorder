@@ -5,18 +5,6 @@ ENV['RACK_ENV'] = 'test'
 require "data_mapper"
 
 require_relative "../lib/datainsight_recorder/datamapper_config"
-module TestDataMapperConfig
-  extend DataInsight::Recorder::DataMapperConfig
-
-  def self.configure(*args)
-    super(*args)
-    DataMapper.auto_migrate!
-  end
-
-  def self.test_uri
-    "sqlite::memory:"
-  end
-end
 
 Datainsight::Logging.configure(:env => :test)
 
