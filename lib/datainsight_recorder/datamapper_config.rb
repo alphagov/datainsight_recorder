@@ -3,6 +3,8 @@ require "yaml"
 require 'dm-constraints'
 require 'dm-migrations'
 
+require_relative "data_mapper/property/date_time"
+
 module DataInsight
   module Recorder
     class DataMapperConfig

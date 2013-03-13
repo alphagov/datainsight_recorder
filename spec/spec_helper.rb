@@ -4,6 +4,8 @@ Bundler.require
 ENV['RACK_ENV'] = 'test'
 require "data_mapper"
 
+Dir[File.expand_path("../support/**/*.rb", __FILE__)].each {|f| require f}
+
 require_relative "../lib/datainsight_recorder/datamapper_config"
 
 Datainsight::Logging.configure(:env => :test)
