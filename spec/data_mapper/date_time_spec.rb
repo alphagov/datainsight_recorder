@@ -8,6 +8,8 @@ describe DataMapper::Property::DateTime do
     DataMapper::Property::DateTime.new(model, name)
   }
 
+  it { should load_property_value(nil).as nil }
+
   describe "should dump dates as UTC" do
     it { should dump_property_value(d('2013-03-10 18:30:00+05:00')).as d('2013-03-10 13:30:00+00:00') }
   end
