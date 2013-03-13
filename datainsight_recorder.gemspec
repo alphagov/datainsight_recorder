@@ -19,6 +19,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency "datainsight_logging"
   gem.add_dependency "data_mapper", "1.2.0"
   gem.add_dependency "dm-mysql-adapter", "1.2.0"
+  gem.add_dependency "tzinfo", "~> 0.3.37"
 
   gem.add_development_dependency("rake")
   gem.add_development_dependency("rspec")
