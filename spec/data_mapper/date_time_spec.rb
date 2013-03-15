@@ -2,6 +2,14 @@ require "spec_helper"
 
 describe DataMapper::Property::DateTime do
 
+  before :all do
+    @default_timezone = DataMapper::Property::DateTime.timezone
+  end
+
+  before :each do
+    DataMapper::Property::DateTime.timezone = @default_timezone
+  end
+
   subject(:date_time_property) {
     model = double("model", repository_name: "repo")
     name = double("name")
@@ -43,7 +51,7 @@ describe DataMapper::Property::DateTime do
     end
 
     describe "with timezone set to Europe/Rome" do
-      before :all do
+      before :each do
         DataMapper::Property::DateTime.timezone = TZInfo::Timezone.get("Europe/Rome")
       end
 
