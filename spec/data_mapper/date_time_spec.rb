@@ -88,5 +88,14 @@ describe DataMapper::Property::DateTime do
       TestModel.first.tested_at.should be_nil
     end
 
+    it "should query correctly" do
+      TestModel.create(tested_at: d('2013-05-30 09:00:00 +01:00'))
+      TestModel.create(tested_at: d('2013-05-30 10:00:00 +01:00'))
+      TestModel.create(tested_at: d('2013-05-30 11:00:00 +01:00'))
+
+      models = TestModel.all(:tested_at.gt => d('2013-05-30 10:00:00 +01:00'))
+      models.should have(1).item
+    end
+
   end
 end
