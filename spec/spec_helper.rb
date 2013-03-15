@@ -10,6 +10,8 @@ Dir[File.expand_path("../support/**/*.rb", __FILE__)].each {|f| require f}
 require_relative "../lib/datainsight_recorder/datamapper_config"
 
 Datainsight::Logging.configure(:env => :test)
+::Logging.logger.root.level = :error
+
 
 def should_be_invalid(record, field, message)
   record.valid?.should be_false
