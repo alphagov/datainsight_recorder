@@ -59,4 +59,34 @@ describe DataMapper::Property::DateTime do
       it { should load_property_value(d('2013-06-01 14:00:00 +00:00')).as d('2013-06-01 16:00:00 +02:00') }
     end
   end
+
+  describe "integration tests" do
+    class TestModel
+      include DataMapper::Resource
+      property :id, DataMapper::Property::Serial
+      property :tested_at, DateTime
+    end
+
+    before(:all) do
+      DataInsight::Recorder::DataMapperConfig.configure(:test)
+      DataMapper.auto_migrate!
+    end
+
+    before(:each) do
+      TestModel.destroy!
+    end
+
+    it "should save and retrieve datetime properties with DST" do
+      TestModel.create(tested_at: d('2013-05-30 10:00:00 +01:00'))
+
+      TestModel.first.tested_at.should equal_date_time d('2013-05-30 10:00:00 +01:00')
+    end
+
+    it "should save and retrieve nil datetime properties" do
+      TestModel.create(tested_at: nil)
+
+      TestModel.first.tested_at.should be_nil
+    end
+
+  end
 end

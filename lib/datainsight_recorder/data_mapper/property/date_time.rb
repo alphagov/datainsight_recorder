@@ -13,12 +13,17 @@ module DataMapper
       end
 
       def load(value)
-        date = base_load(value)
-        date.new_offset(DateTime.timezone.period_for_utc(date).utc_total_offset_rational) unless date.nil?
+        to_timezone(base_load(value))
       end
 
+      private
+
       def to_utc(date)
-        date.new_offset(0)
+        date.new_offset(0) unless date.nil?
+      end
+
+      def to_timezone(date)
+        date.new_offset(DateTime.timezone.period_for_utc(date).utc_total_offset_rational) unless date.nil?
       end
 
       class << self
