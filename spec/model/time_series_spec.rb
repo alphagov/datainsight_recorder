@@ -1,7 +1,15 @@
 require_relative "../spec_helper"
 require "data_mapper"
+require "tzinfo"
 require_relative "../../lib/datainsight_recorder/base_fields"
 require_relative "../../lib/datainsight_recorder/time_series"
+
+class DateTime
+  def with_tz_offset(region)
+    offset = TZInfo::Timezone.get(region).period_for_utc(self).utc_total_offset_rational
+    (self - offset).new_offset(offset)
+  end
+end
 
 class TestWeekSeries
   include DataMapper::Resource
@@ -85,6 +93,28 @@ describe "TimeSeries" do
       should_be_invalid(record, :validate_time_series_week, "The time between start and end should be a week.")
     end
 
+    it "should not allow a time period that does not start at midnight" do
+      record = TestWeekSeries.new(
+        :source => "My source",
+        :collected_at => DateTime.now,
+        :start_at => DateTime.new(2012, 1, 1, 1),
+        :end_at => DateTime.new(2012, 1, 8, 1)
+      )
+
+      should_be_invalid(record, :validate_time_series_week, "The time period must start at midnight.")
+    end
+
+    it "should not allow a time period that does not end at midnight" do
+      record = TestWeekSeries.new(
+        :source => "My source",
+        :collected_at => DateTime.now,
+        :start_at => DateTime.new(2012, 1, 1, 0),
+        :end_at => DateTime.new(2012, 1, 8, 1)
+      )
+
+      should_be_invalid(record, :validate_time_series_week, "The time period must end at midnight.")
+    end
+
     it "should allow a time period of exactly one week" do
       record = TestWeekSeries.new(
         :source => "My Source",
@@ -93,6 +123,17 @@ describe "TimeSeries" do
         :end_at => DateTime.new(2012, 1, 8)
       )
       
+      record.valid?.should be_true
+    end
+
+    it "should allow a time period of exactly one week when changing to daylight saving" do
+      record = TestWeekSeries.new(
+        :source => "My Source",
+        :collected_at => DateTime.new,
+        :start_at => DateTime.new(2013, 3, 31).with_tz_offset("Europe/London"),
+        :end_at => DateTime.new(2013, 4, 7).with_tz_offset("Europe/London")
+      )
+
       record.valid?.should be_true
     end
   end

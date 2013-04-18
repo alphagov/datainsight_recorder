@@ -8,7 +8,14 @@ module DataInsight
 
       def validate_time_series_week
         unless end_at.nil? || start_at.nil?
-          if (end_at - start_at) == 7
+          unless midnight?(start_at)
+            return [false, "The time period must start at midnight."]
+          end
+          unless midnight?(end_at)
+            return [false, "The time period must end at midnight."]
+          end
+
+          if (end_at.to_date - start_at.to_date) == 7
             true
           else
             [false, "The time between start and end should be a week."]
@@ -17,12 +24,11 @@ module DataInsight
       end
 
       def validate_time_series_day
-
         unless start_at.nil? || end_at.nil?
           if (end_at - start_at) != 1
             return [false, "The time period must be a day."]
           end
-          if start_at.hour != 0 || start_at.minute != 0 || start_at.second != 0 || start_at.second_fraction != 0
+          unless midnight?(start_at)
             return [false, "The time period must start at midnight."]
           end
           true
@@ -40,6 +46,12 @@ module DataInsight
         end
         return true
       end
+
+      private
+      def midnight?(datetime)
+        datetime.hour == 0 && datetime.minute == 0 && datetime.second == 0 && datetime.second_fraction == 0
+      end
+
     end
   end
 end
